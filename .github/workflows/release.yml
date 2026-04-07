@@ -3,35 +3,44 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*"
 
 permissions:
   contents: write
 
 jobs:
-  # ── Linux build → AppImage ──────────────────────────────────────────────────
-  build-linux:
-    name: Build Linux (AppImage)
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            venv_pip: venv-wvd/bin/pip
+          - os: windows-latest
+            platform: win
+            venv_pip: venv-wvd\Scripts\pip
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.platform }})
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: '20'
-          cache: 'npm'
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Create Python venv
+        run: python -m venv venv-wvd
 
-      - name: Build Python venv (backend)
-        run: bash setup.sh
+      - name: Install Python dependencies
+        run: ${{ matrix.venv_pip }} install -r requirements.txt
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -43,81 +52,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload AppImage artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-appimage
-          path: release/*.AppImage
+          name: release-${{ matrix.platform }}
+          path: release/*
           if-no-files-found: error
 
-  # ── Windows build → NSIS installer + portable ──────────────────────────────
-  build-windows:
-    name: Build Windows (NSIS + portable)
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Build Python venv (backend)
-        shell: pwsh
-        run: .\setup.ps1
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build Electron app
-        working-directory: frontend
-        run: npm run electron:build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-installers
-          path: |
-            release/*Setup*.exe
-            release/*-portable*.exe
-          if-no-files-found: error
-
-  # ── Create GitHub Release with all artifacts ────────────────────────────────
-  release:
-    name: Publish GitHub Release
-    needs: [build-linux, build-windows]
+  publish:
+    needs: build
     runs-on: ubuntu-latest
+    name: Publish Release
 
     steps:
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: linux-appimage
-          path: dist/
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-installers
-          path: dist/
+          path: artifacts
+          merge-multiple: true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: artifacts/*
           generate_release_notes: true
-          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
