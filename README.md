@@ -1,10 +1,10 @@
+# CesiumWVD
 # WVD Extractor
 
 Automated tool to extract a Widevine CDM (`device.wvd`) from an Android device.
 
 This is a **one-time process**. Once you have the `.wvd` file, you won't need to do this again.
 
----
 
 ## What You Need
 
@@ -20,9 +20,6 @@ The script handles **everything automatically**. You only need the Android SDK i
 > **WSL2 users**: see the [WSL2 port bridge](#wsl2-users-one-extra-step) section before running.
 
 **What's automated:**
-- **Python** — downloaded automatically as a portable binary if not on your system
-- **Android system image** — downloaded automatically (~1.3 GB, one-time) if not already installed; you must accept the Android SDK License Agreement
-- **Emulator** — a temporary `wvd_extractor_tmp` AVD is created, booted, used, then deleted
 
 The script looks for the SDK in the standard locations (`%LOCALAPPDATA%\Android\Sdk` on Windows / `/mnt/c/Users/<user>/AppData/Local/Android/Sdk` from WSL2 / `~/Android/Sdk` on Linux).
 
@@ -37,7 +34,6 @@ The script looks for the SDK in the standard locations (`%LOCALAPPDATA%\Android\
 | **USB cable** | Connect to your computer |
 | **Internet connection** | To download Python (if missing) and frida-server |
 
----
 
 ## Quick Start
 
@@ -77,7 +73,6 @@ cd wvd-extractor
 ./extract.sh --output /tmp/cdm      # Custom output directory
 ```
 
----
 
 ## What Happens Under the Hood
 
@@ -89,7 +84,6 @@ cd wvd-extractor
 6. **KeyDive** — hooks into the Widevine CDM, triggers a DRM test, extracts keys
 7. **Install** — verifies the `.wvd` file and lets you choose where to save it
 
----
 
 ## WSL2 Users: One Extra Step
 
@@ -103,55 +97,34 @@ The script will print this exact command and exit if the bridge isn't active. To
 
 > Verify with `adb devices` in a Windows terminal — the emulator should appear there after it boots.
 
----
 
 ## Troubleshooting
 
 ### "Android SDK not found — cannot auto-create emulator"
 
-- Install [Android Studio](https://developer.android.com/studio); the SDK is bundled at `%LOCALAPPDATA%\Android\Sdk`
-- Or set the `ANDROID_HOME` environment variable to your SDK path
-- The emulator binary itself must be present — install it via SDK Manager → SDK Tools → Android Emulator
 
 ### "No compatible system image found" / system image download fails
 
 The script downloads the system image automatically. If the download fails:
-- Check your internet connection
-- Install manually: Android Studio → **SDK Manager** → **SDK Platforms** → check **Show Package Details** → **Android 10.0 (API 29) → Google APIs Intel x86_64 Atom System Image → Install**
-- The script also accepts: API 29 x86, API 28 x86_64/x86, API 33 x86_64
 
 ### "No Android devices found"
 
-- **Emulator**: if auto-create failed, check the troubleshooting steps above; or start one manually in Android Studio
-- **Physical device**: enable USB debugging, reconnect cable, check `adb devices`
-- **WSL2**: set up the port bridge (see section above)
 
 ### "Could not get root access"
 
-- **Emulator**: the auto-created AVD uses a "Google APIs" image (not "Google Play") so root always works
-- **Physical device**: make sure it's properly rooted (check with `adb shell su`)
-- If you created the emulator manually, ensure you chose **"Google APIs"**, not **"Google Play"**
 
 ### "KeyDive timed out"
 
-- The emulator can be slow to start on the first boot. Increase the timeout:
   ```
   ./extract.sh --timeout 300
   ```
-- Make sure the emulator has internet access (try opening a website in Chrome inside it)
 
 ### "frida-server download failed"
 
-- Check your internet connection
-- If behind a proxy, set `http_proxy` / `https_proxy` environment variables
 
 ### "No .wvd file found"
 
-- KeyDive ran but couldn't extract the CDM
-- Try restarting the emulator and running again
-- Try a different API level in the SDK Manager and re-run
 
----
 
 ## Cleanup
 
@@ -165,7 +138,6 @@ rm -rf ~/.cache/wvd-extractor
 
 The Android system image (~1.4 GB) stays in your SDK directory — it's part of your Android SDK installation and can be removed via Android Studio → SDK Manager.
 
----
 
 ## File Structure
 
