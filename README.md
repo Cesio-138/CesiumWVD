@@ -1,5 +1,5 @@
 # CesiumWVD
-# WVD Extractor
+
 
 Automated tool to extract a Widevine CDM (`device.wvd`) from an Android device.
 
@@ -40,7 +40,7 @@ The script looks for the SDK in the standard locations (`%LOCALAPPDATA%\Android\
 ### Linux / WSL2
 
 ```bash
-cd wvd-extractor
+cd CesiumWVD
 
 # 1. Install dependencies (one time)
 chmod +x setup.sh extract.sh
@@ -53,7 +53,7 @@ chmod +x setup.sh extract.sh
 ### Windows (PowerShell)
 
 ```powershell
-cd wvd-extractor
+cd CesiumWVD
 
 # 1. Install dependencies (one time)
 .\setup.ps1
@@ -132,8 +132,8 @@ After extraction, the emulator and AVD are deleted automatically. To free up all
 
 ```bash
 # Delete everything (venv, portable Python, cached frida-server)
-rm -rf /path/to/wvd-extractor
-rm -rf ~/.cache/wvd-extractor
+rm -rf /path/to/CesiumWVD
+rm -rf ~/.cache/CesiumWVD
 ```
 
 The Android system image (~1.4 GB) stays in your SDK directory — it's part of your Android SDK installation and can be removed via Android Studio → SDK Manager.
@@ -142,7 +142,7 @@ The Android system image (~1.4 GB) stays in your SDK directory — it's part of 
 ## File Structure
 
 ```
-wvd-extractor/
+CesiumWVD/
 ├── setup.sh / setup.ps1       ← Install dependencies (auto-downloads Python if needed)
 ├── extract.sh / extract.ps1   ← Run extraction
 ├── requirements.txt            ← Python packages

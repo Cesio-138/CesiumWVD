@@ -1,0 +1,31 @@
+appId: com.wvd-extractor.app
+productName: WVD-Extractor
+
+directories:
+  output: ../release
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+
+extraResources:
+  - from: ../src
+    to: backend/src
+    filter:
+      - "**/*.py"
+  - from: ../venv-wvd
+    to: backend/venv-wvd
+    filter:
+      - "**/*"
+  - from: ../requirements.txt
+    to: backend/requirements.txt
+
+linux:
+  target:
+    - AppImage
+  category: Utility
+
+win:
+  target:
+    - nsis
+    - portable

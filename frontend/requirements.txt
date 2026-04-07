@@ -1,0 +1,3 @@
+keydive>=3.0.0
+frida
+requests
