@@ -1,10 +1,16 @@
 {
-  "name": "wvd-extractor",
+  "name": "cesiumwvd",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "WVD Extractor — Guided Widevine CDM extraction wizard",
-  "author": "IgorMael",
+  "description": "CesiumWVD — Automated Widevine CDM extraction wizard",
+  "author": "Cesio-138",
+  "homepage": "https://github.com/Cesio-138/CesiumWVD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cesio-138/CesiumWVD.git"
+  },
+  "license": "MIT",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",

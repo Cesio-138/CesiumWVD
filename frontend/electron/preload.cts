@@ -17,6 +17,8 @@ export interface ElectronAPI {
   };
   shell: {
     openPath: (filePath: string) => Promise<void>;
+    openPowerShellAdmin: (command: string) => Promise<void>;
+    openExternal: (url: string) => Promise<void>;
   };
 }
 
@@ -46,5 +48,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   shell: {
     openPath: (filePath: string) => ipcRenderer.invoke('shell:openPath', filePath),
     openPowerShellAdmin: (command: string) => ipcRenderer.invoke('shell:openPowerShellAdmin', command),
+    openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
   },
 });

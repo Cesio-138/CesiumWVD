@@ -13,7 +13,7 @@ from . import adb_utils
 from .ui import info, warn, error, success
 
 
-CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "wvd-extractor"
+CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "CesiumWVD"
 REMOTE_PATH = "/data/local/tmp/frida-server"
 
 

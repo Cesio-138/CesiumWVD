@@ -1,5 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+import * as os from 'os';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 import { PythonBridge } from './python-bridge.js';
@@ -17,7 +19,7 @@ function getBackendRoot(): string {
   if (app.isPackaged) {
     return path.join(process.resourcesPath, 'backend');
   }
-  // dev: __dirname is frontend/dist-electron, go up to wvd-extractor/
+  // dev: __dirname is frontend/dist-electron, go up to CesiumWVD/
   return path.resolve(__dirname, '..', '..');
 }
 
@@ -115,11 +117,82 @@ ipcMain.handle('shell:openPowerShellAdmin', (_event, command: string) => {
   ps.unref();
 });
 
+ipcMain.handle('shell:openExternal', (_event, url: string) => {
+  // Allowlist: only open http/https URLs to prevent arbitrary protocol abuse.
+  if (/^https?:\/\//i.test(url)) {
+    shell.openExternal(url);
+  }
+});
+
+// ─── Linux desktop integration ───────────────────────────────────────────────
+
+async function checkFirstRunDesktopInstall(): Promise<void> {
+  // Only relevant when running as an AppImage on Linux.
+  if (process.platform !== 'linux' || !process.env.APPIMAGE) return;
+
+  const sentinelDir = app.getPath('userData');
+  const sentinel    = path.join(sentinelDir, 'desktop-installed');
+  if (fs.existsSync(sentinel)) return;  // already asked before
+
+  const appsDir  = path.join(os.homedir(), '.local', 'share', 'applications');
+  const iconsDir = path.join(os.homedir(), '.local', 'share', 'icons', 'hicolor', '256x256', 'apps');
+  const desktop  = path.join(appsDir, 'cesiumwvd.desktop');
+
+  const { response } = await dialog.showMessageBox({
+    type: 'question',
+    title: 'Add to app launcher?',
+    message: 'Add CesiumWVD to your application launcher for easy access?',
+    detail: 'This creates a desktop entry so the app appears in GNOME, KDE, and other launchers.',
+    buttons: ['Add to launcher', 'Not now'],
+    defaultId: 0,
+    cancelId: 1,
+  });
+
+  // Mark as asked regardless of choice, so we don't ask on every launch.
+  try {
+    fs.mkdirSync(sentinelDir, { recursive: true });
+    fs.writeFileSync(sentinel, '');
+  } catch { /* non-fatal */ }
+
+  if (response !== 0) return;
+
+  try {
+    fs.mkdirSync(appsDir,  { recursive: true });
+    fs.mkdirSync(iconsDir, { recursive: true });
+
+    // Copy bundled icon
+    const srcIcon = path.join(process.resourcesPath, 'icon.png');
+    const dstIcon = path.join(iconsDir, 'cesiumwvd.png');
+    if (fs.existsSync(srcIcon)) fs.copyFileSync(srcIcon, dstIcon);
+
+    // Write .desktop entry
+    const desktopEntry = [
+      '[Desktop Entry]',
+      'Type=Application',
+      'Name=CesiumWVD',
+      'Comment=Extract a Widevine CDM from an Android device or emulator',
+      `Exec=${process.env.APPIMAGE}`,
+      'Icon=cesiumwvd',
+      'Terminal=false',
+      'Categories=Utility;',
+      'StartupNotify=true',
+    ].join('\n') + '\n';
+
+    fs.writeFileSync(desktop, desktopEntry, { encoding: 'utf8' });
+
+    // Refresh desktop database (fire-and-forget; failure is non-fatal)
+    spawn('update-desktop-database', [appsDir], { detached: true, stdio: 'ignore' }).unref();
+  } catch (err) {
+    console.error('[desktop-install] failed:', err);
+  }
+}
+
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
   startPythonBridge();
+  await checkFirstRunDesktopInstall();
 });
 
 app.on('window-all-closed', () => {

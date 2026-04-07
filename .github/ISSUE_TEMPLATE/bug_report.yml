@@ -1,0 +1,93 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please fill in the details below so we can reproduce the issue.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux
+        - WSL2
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS Version
+      description: "e.g., Ubuntu 24.04, Windows 11 23H2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface
+      options:
+        - CLI (extract.sh / extract.ps1)
+        - Electron GUI
+    validations:
+      required: true
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python version
+      description: "Output of `python3 --version`"
+    validations:
+      required: true
+
+  - type: input
+    id: adb_version
+    attributes:
+      label: ADB version
+      description: "Output of `adb --version` (first line)"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: device_type
+    attributes:
+      label: Device type
+      options:
+        - Auto-created emulator
+        - Existing emulator
+        - Physical device (rooted)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What commands did you run?
+      placeholder: |
+        1. ./setup.sh
+        2. ./extract.sh
+        3. Error at step X...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Full error output
+      description: Copy-paste the terminal output. This will be formatted as code.
+      render: shell
+    validations:
+      required: false

@@ -20,7 +20,10 @@ export function useBackend() {
   const [prompt, setPrompt] = useState<PendingPrompt | null>(null);
   const [wvdPath, setWvdPath] = useState<string | null>(null);
   const [pipelineStatus, setPipelineStatus] = useState<string>('idle');
+  const [preflightStatus, setPreflightStatus] = useState<'idle' | 'checking' | 'ok' | 'missing'>('idle');
+  const [preflightMissing, setPreflightMissing] = useState<string[]>([]);
   const logIdRef = useRef(0);
+  const preflightSentRef = useRef(false);
 
   const addLog = useCallback((type: LogEntry['type'], message: string) => {
     const id = ++logIdRef.current;
@@ -116,11 +119,22 @@ export function useBackend() {
         case 'status':
           setPipelineStatus(data.status);
           break;
+
+        case 'preflight_result':
+          setPreflightStatus(data.ok ? 'ok' : 'missing');
+          setPreflightMissing(data.missing ?? []);
+          break;
       }
     });
 
     const removeStatus = api.python.onStatus((s) => {
       setStatus(s);
+      // Trigger preflight automatically the first time the backend becomes ready.
+      if (s === 'ready' && !preflightSentRef.current) {
+        preflightSentRef.current = true;
+        setPreflightStatus('checking');
+        api.python.send({ cmd: 'preflight' });
+      }
     });
 
     return () => {
@@ -139,6 +153,11 @@ export function useBackend() {
     setPrompt(null);
   }, [send]);
 
+  const retryPreflight = useCallback(() => {
+    setPreflightStatus('checking');
+    send({ cmd: 'preflight' });
+  }, [send]);
+
   const clearLogs = useCallback(() => {
     setLogs([]);
     logIdRef.current = 0;
@@ -154,9 +173,12 @@ export function useBackend() {
     prompt,
     wvdPath,
     pipelineStatus,
+    preflightStatus,
+    preflightMissing,
     send,
     respondToPrompt,
     respondConfirm,
+    retryPreflight,
     addLog,
     clearLogs,
   };

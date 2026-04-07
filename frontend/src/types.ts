@@ -59,6 +59,12 @@ export interface CommandBlockEvent {
   description: string;
 }
 
+export interface PreflightResultEvent {
+  event: 'preflight_result';
+  ok: boolean;
+  missing: string[];
+}
+
 export type BackendEvent =
   | StepEvent
   | MessageEvent
@@ -69,7 +75,8 @@ export type BackendEvent =
   | StatusEvent
   | DoneEvent
   | PongEvent
-  | CommandBlockEvent;
+  | CommandBlockEvent
+  | PreflightResultEvent;
 
 // ─── Wizard state ───────────────────────────────────────────────────────────
 

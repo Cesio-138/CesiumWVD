@@ -1,4 +1,10 @@
-"""Trigger Widevine DRM via frida injection into an Android process."""
+"""
+Standalone DRM trigger prototype — for manual testing without the main pipeline.
+
+This is a self-contained script that uses frida to inject a Widevine DRM trigger
+into a running Android process. The main pipeline (src/drm_trigger.py + src/keydive_runner.py)
+handles this automatically; this file is kept for reference and manual debugging.
+"""
 import frida
 import time
 

@@ -85,6 +85,9 @@ export default function App() {
             <WelcomeStep
               onStart={handleStart}
               backendStatus={backend.status}
+              preflightStatus={backend.preflightStatus}
+              preflightMissing={backend.preflightMissing}
+              onRetryPreflight={backend.retryPreflight}
             />
           )}
           {wizard.wizardStep === 'environment' && (

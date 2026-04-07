@@ -3,6 +3,13 @@ cdm-output/
 .python/
 __pycache__/
 *.pyc
+release/
+
+# Secrets / credentials — never commit
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Frontend
 frontend/node_modules/

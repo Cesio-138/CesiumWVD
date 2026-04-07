@@ -199,3 +199,35 @@ def run_all_checks() -> str:
     adb = check_adb()
     check_wsl2_bridge(adb)
     return adb
+
+
+def preflight_check() -> dict:
+    """
+    Non-fatal prerequisite probe for the GUI pre-flight banner.
+
+    Returns:
+        {"ok": True, "missing": []}
+        {"ok": False, "missing": ["adb", "sdk"]}   # one or both can be missing
+    """
+    missing = []
+
+    # Python version (should always pass if this code is running, but check anyway)
+    if sys.version_info < (3, 8):
+        missing.append("python")
+
+    # ADB
+    adb = find_adb()
+    if not adb:
+        missing.append("adb")
+
+    # Android SDK emulator (avdmanager / emulator binary)
+    # Import lazily to avoid a hard dependency at module level
+    try:
+        from . import avd_manager  # noqa: PLC0415
+        sdk_ok, _ = avd_manager.is_available()
+        if not sdk_ok:
+            missing.append("sdk")
+    except Exception:
+        missing.append("sdk")
+
+    return {"ok": len(missing) == 0, "missing": missing}

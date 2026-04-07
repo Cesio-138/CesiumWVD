@@ -321,6 +321,9 @@ def main():
         if action == "start":
             _emit({"event": "status", "status": "running"})
             run_extraction(cmd.get("options", {}))
+        elif action == "preflight":
+            result = check_prereqs.preflight_check()
+            _emit({"event": "preflight_result", "ok": result["ok"], "missing": result["missing"]})
         elif action == "ping":
             _emit({"event": "pong"})
         elif action == "quit":

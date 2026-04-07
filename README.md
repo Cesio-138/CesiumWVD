@@ -1,162 +1,82 @@
-# CesiumWVD
+<h1 align="center">CesiumWVD</h1>
 
+<p align="center">
+  Automated Widevine CDM extraction from Android devices and emulators.
+</p>
 
-Automated tool to extract a Widevine CDM (`device.wvd`) from an Android device.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20WSL2%20%7C%20Windows-brightgreen" alt="Platform">
+  <img src="https://img.shields.io/badge/python-%E2%89%A53.8-3776AB" alt="Python 3.8+">
+</p>
 
-This is a **one-time process**. Once you have the `.wvd` file, you won't need to do this again.
+---
 
+Extract a Widevine CDM (`device.wvd`) in minutes. This is a **one-time process** — once you have the file, use it with [pywidevine](https://github.com/devine-dl/pywidevine) and never run this again.
 
-## What You Need
+> [!IMPORTANT]
+> **macOS is not supported.** Linux, WSL2, and Windows only.
 
-### Option A: Android Emulator (Recommended — fully automated)
+## Disclaimer
 
-The script handles **everything automatically**. You only need the Android SDK installed.
+This tool is provided for **personal, educational, and research purposes only**. Extracting Widevine CDM keys may violate the Terms of Service of certain platforms. The authors are not responsible for any misuse. **You are solely responsible for compliance with applicable laws and service agreements.**
 
-| Requirement | Details |
+## Get Started
+
+Download the latest release for your platform from the **[Releases page](../../releases/latest)**:
+
+| Platform | Download |
 |---|---|
-| **Android SDK** | Install [Android Studio](https://developer.android.com/studio) (SDK + Emulator are bundled) or the standalone [SDK command-line tools](https://developer.android.com/studio#command-tools) |
-| **Internet connection** | Downloads Python, frida-server, and the system image if any are missing |
+| **Linux** | `CesiumWVD-x.x.x.AppImage` — make executable, double-click to run |
+| **Windows** | `CesiumWVD-Setup-x.x.x.exe` — run the installer, launch from the desktop shortcut |
 
-> **WSL2 users**: see the [WSL2 port bridge](#wsl2-users-one-extra-step) section before running.
+Open CesiumWVD. The wizard guides you through four automatic steps:
 
-**What's automated:**
+1. **Environment check** — detects your Android SDK and ADB. If anything is missing, it shows a direct install link and a Re-check button.
+2. **Device setup** — auto-creates a temporary Android emulator, or uses a connected rooted phone.
+3. **CDM extraction** — deploys frida-server, runs KeyDive, and captures the Widevine keys.
+4. **Save** — verifies the `.wvd` file and lets you choose where to keep it.
 
-The script looks for the SDK in the standard locations (`%LOCALAPPDATA%\Android\Sdk` on Windows / `/mnt/c/Users/<user>/AppData/Local/Android/Sdk` from WSL2 / `~/Android/Sdk` on Linux).
+**The whole process takes about 3–5 minutes.**
 
-> **Why API 29 Google APIs?** The script uses Android 10 (API 29) with the `google_apis` image — not `google_play`. The `google_play` variant blocks `adb root` and `su`, which frida requires to hook into Widevine. API 29 is the sweet spot: modern Widevine L3 support with reliable emulation.
+### What you need
 
-### Option B: Physical Android Device (Rooted)
-
-| Requirement | Details |
+| | |
 |---|---|
-| **Rooted device** | Via Magisk or similar |
-| **USB debugging** | Settings → Developer Options → USB Debugging ON |
-| **USB cable** | Connect to your computer |
-| **Internet connection** | To download Python (if missing) and frida-server |
+| **Android SDK** | Install [Android Studio](https://developer.android.com/studio) — it includes the SDK and emulator |
 
+> **WSL2 users:** a one-time network bridge step is required before the emulator is reachable. [See WSL2 Setup →](docs/troubleshooting.md#wsl2-setup)
 
-## Quick Start
+## CLI / Headless Use
 
-### Linux / WSL2
+CesiumWVD also runs as a command-line tool — useful for automation or headless environments:
 
 ```bash
-cd CesiumWVD
-
-# 1. Install dependencies (one time)
-chmod +x setup.sh extract.sh
-./setup.sh
-
-# 2. Run — the emulator is created and started automatically if the SDK is found
-./extract.sh
+./setup.sh && ./extract.sh        # Linux / WSL2
+.\setup.ps1; .\extract.ps1        # Windows PowerShell
 ```
 
-### Windows (PowerShell)
+[Full CLI guide →](docs/cli.md)
 
-```powershell
-cd CesiumWVD
+## Documentation
 
-# 1. Install dependencies (one time)
-.\setup.ps1
+| | |
+|---|---|
+| [GUI Guide](docs/gui.md) | Building from source, development mode |
+| [CLI Guide](docs/cli.md) | Options, flags, scripting, WSL2 bridge |
+| [Architecture](docs/architecture.md) | IPC protocol and pipeline internals |
+| [Troubleshooting](docs/troubleshooting.md) | Error messages and fixes |
 
-# 2. Run — the emulator is created and started automatically if the SDK is found
-.\extract.ps1
-```
+## Related Projects
 
-### Options
+- [KeyDive](https://github.com/hyugogirubato/KeyDive) — Widevine L3 key extraction via frida hooking
+- [pywidevine](https://github.com/devine-dl/pywidevine) — Python Widevine CDM implementation
+- [frida](https://frida.re/) — Dynamic instrumentation toolkit
 
-```
-./extract.sh                        # Auto-detect or auto-create device
-./extract.sh --device emulator-5554 # Use a specific already-running device
-./extract.sh --no-create            # Skip emulator auto-create, use existing device
-./extract.sh --keep-avd             # Keep the temporary AVD after extraction
-./extract.sh --timeout 300          # Increase KeyDive timeout (default: 180s)
-./extract.sh --output /tmp/cdm      # Custom output directory
-```
+## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## What Happens Under the Hood
+## License
 
-1. **Environment detection** — figures out if you're on Linux, WSL2, or Windows
-2. **Prerequisite checks** — verifies ADB is available, sets up WSL2↔Windows bridge if needed
-3. **Emulator auto-create** — if no device is connected, finds your Android SDK, writes a temporary AVD config, and launches the emulator via PowerShell (WSL2) or directly (Linux/Windows)
-4. **Device connection** — waits for the emulator to boot, then gets root access
-5. **frida-server** — downloads the right version for your device architecture, pushes and starts it
-6. **KeyDive** — hooks into the Widevine CDM, triggers a DRM test, extracts keys
-7. **Install** — verifies the `.wvd` file and lets you choose where to save it
-
-
-## WSL2 Users: One Extra Step
-
-The Android emulator runs as a Windows process. For WSL2's ADB to see it, you need to forward port 5037 **once** (run in a **Windows PowerShell as Administrator**):
-
-```powershell
-netsh interface portproxy add v4tov4 listenport=5037 listenaddress=0.0.0.0 connectport=5037 connectaddress=127.0.0.1
-```
-
-The script will print this exact command and exit if the bridge isn't active. To make it permanent, add it to a startup task or run it whenever you reboot Windows.
-
-> Verify with `adb devices` in a Windows terminal — the emulator should appear there after it boots.
-
-
-## Troubleshooting
-
-### "Android SDK not found — cannot auto-create emulator"
-
-
-### "No compatible system image found" / system image download fails
-
-The script downloads the system image automatically. If the download fails:
-
-### "No Android devices found"
-
-
-### "Could not get root access"
-
-
-### "KeyDive timed out"
-
-  ```
-  ./extract.sh --timeout 300
-  ```
-
-### "frida-server download failed"
-
-
-### "No .wvd file found"
-
-
-
-## Cleanup
-
-After extraction, the emulator and AVD are deleted automatically. To free up all space:
-
-```bash
-# Delete everything (venv, portable Python, cached frida-server)
-rm -rf /path/to/CesiumWVD
-rm -rf ~/.cache/CesiumWVD
-```
-
-The Android system image (~1.4 GB) stays in your SDK directory — it's part of your Android SDK installation and can be removed via Android Studio → SDK Manager.
-
-
-## File Structure
-
-```
-CesiumWVD/
-├── setup.sh / setup.ps1       ← Install dependencies (auto-downloads Python if needed)
-├── extract.sh / extract.ps1   ← Run extraction
-├── requirements.txt            ← Python packages
-├── .python/                    ← Portable Python (created if none found on system)
-├── venv-wvd/                   ← Python virtual environment (created by setup)
-├── cdm-output/                 ← Where extracted files go
-└── src/
-    ├── main.py                 ← Main orchestrator (7-step flow)
-    ├── avd_manager.py          ← Emulator auto-create, system image download & lifecycle
-    ├── env_detect.py           ← Platform detection (Linux / WSL2 / Windows)
-    ├── check_prereqs.py        ← Prerequisite validation
-    ├── adb_utils.py            ← ADB device management
-    ├── frida_setup.py          ← frida-server lifecycle
-    ├── keydive_runner.py       ← KeyDive execution
-    ├── wvd_install.py          ← WVD verification & install
-    └── ui.py                   ← Terminal output formatting
-```
+[MIT](LICENSE)
