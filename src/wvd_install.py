@@ -3,12 +3,11 @@ Verify the extracted .wvd and install it to the user's chosen location.
 """
 
 import shutil
-import sys
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from . import env_detect
-from .ui import info, error, success, prompt_choice, prompt_path
+from .ui import error, info, prompt_choice, prompt_path, success
 
 
 def verify_wvd(wvd_path: Path) -> bool:

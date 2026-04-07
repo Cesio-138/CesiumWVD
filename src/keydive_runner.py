@@ -2,19 +2,16 @@
 Run KeyDive to extract the Widevine CDM from the device.
 """
 
-import glob
 import os
+import shutil
 import subprocess
 import sys
-import shutil
 import threading
 from pathlib import Path
 from typing import Optional
 
-from . import env_detect
-from . import drm_trigger
-from .ui import info, error, warn, success, fatal
-
+from . import drm_trigger, env_detect
+from .ui import error, fatal, info, success, warn
 
 DEFAULT_TIMEOUT = 180  # 3 minutes — CDM init can be slow
 

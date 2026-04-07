@@ -6,9 +6,9 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
-from .ui import info, warn, error, fatal, success, prompt_choice
+from .ui import error, fatal, info, prompt_choice, success
 
 
 @dataclass

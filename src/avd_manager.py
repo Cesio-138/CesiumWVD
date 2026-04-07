@@ -1,4 +1,4 @@
-"""
+r"""
 Programmatic Android Virtual Device (AVD) management.
 
 Creates, starts, and optionally deletes a temporary AVD for CDM extraction.
@@ -11,7 +11,6 @@ Supported on:
 """
 
 import os
-import platform
 import shutil
 import subprocess
 import sys
@@ -21,11 +20,10 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 from . import env_detect
-from .ui import info, warn, error, success, confirm
-
+from .ui import confirm, error, info, success, warn
 
 AVD_NAME = "wvd_extractor_tmp"
 AVD_DISPLAY_NAME = "WVD Extractor (temporary)"
@@ -406,13 +404,13 @@ def download_system_image(sdk_root: Path, api: str, tag: str, arch: str) -> bool
 def _get_known_serials(adb: str) -> List[str]:
     try:
         r = subprocess.run([adb, "devices"], capture_output=True, text=True, timeout=5)
-        return [l.split()[0] for l in r.stdout.splitlines()[1:] if "\t" in l]
+        return [line.split()[0] for line in r.stdout.splitlines()[1:] if "\t" in line]
     except Exception:
         return []
 
 
 def _to_windows_path(wsl_path: str) -> str:
-    """Convert a WSL2 /mnt/c/... path to a Windows C:\... path."""
+    r"""Convert a WSL2 /mnt/c/... path to a Windows C:\... path."""
     try:
         return subprocess.check_output(
             ["wslpath", "-w", wsl_path],
@@ -603,7 +601,7 @@ def setup_emulator(adb: str) -> Optional[str]:
     if not create_avd(sdk, api, tag, arch):
         return None
 
-    proc = start_emulator(emu)
+    start_emulator(emu)
 
     # Wait for it to appear in adb devices
     print()

@@ -11,10 +11,10 @@ Must be run AFTER keydive has attached its hooks to the Widevine DRM process.
 Uses frida CLI (not the Python API) because the CLI properly initializes
 the Java bridge, which is required for MediaDrm injection.
 """
+import logging
+import shutil
 import subprocess
 import tempfile
-import shutil
-import logging
 from pathlib import Path
 
 logger = logging.getLogger(__name__)

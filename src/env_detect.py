@@ -3,8 +3,8 @@ Platform and environment detection utilities.
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -18,7 +18,7 @@ def is_wsl2() -> bool:
     if is_windows():
         return False
     try:
-        with open("/proc/version", "r") as f:
+        with open("/proc/version") as f:
             return "microsoft" in f.read().lower()
     except FileNotFoundError:
         return False
@@ -50,7 +50,7 @@ def get_windows_ip_from_wsl() -> Optional[str]:
         pass
     # Fallback: /etc/resolv.conf nameserver
     try:
-        with open("/etc/resolv.conf", "r") as f:
+        with open("/etc/resolv.conf") as f:
             for line in f:
                 if line.strip().startswith("nameserver"):
                     return line.split()[1]

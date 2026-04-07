@@ -9,8 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from . import env_detect
-from .ui import step, info, warn, error, fatal, success, command_block
-
+from .ui import command_block, error, fatal, info, success, warn
 
 # Well-known SDK platform-tools locations per OS
 _ADB_SEARCH_PATHS = []
@@ -143,7 +142,7 @@ def check_wsl2_bridge(adb: str):
                 [adb, "devices"],
                 capture_output=True, text=True, timeout=5,
             )
-            lines = [l for l in result.stdout.strip().splitlines() if "\tdevice" in l]
+            lines = [line for line in result.stdout.strip().splitlines() if "\tdevice" in line]
             if lines:
                 success(f"ADB connected — {len(lines)} device(s) visible.")
             else:
@@ -166,7 +165,7 @@ def check_wsl2_bridge(adb: str):
             [adb, "devices"],
             capture_output=True, text=True, timeout=5,
         )
-        lines = [l for l in result.stdout.strip().splitlines() if "\tdevice" in l]
+        lines = [line for line in result.stdout.strip().splitlines() if "\tdevice" in line]
         if lines:
             success("ADB bridge working — device(s) visible from WSL2.")
             return
@@ -210,10 +209,6 @@ def preflight_check() -> dict:
         {"ok": False, "missing": ["adb", "sdk"]}   # one or both can be missing
     """
     missing = []
-
-    # Python version (should always pass if this code is running, but check anyway)
-    if sys.version_info < (3, 8):
-        missing.append("python")
 
     # ADB
     adb = find_adb()

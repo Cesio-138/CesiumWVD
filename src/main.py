@@ -21,15 +21,16 @@ _here = Path(__file__).resolve().parent
 if str(_here.parent) not in sys.path:
     sys.path.insert(0, str(_here.parent))
 
-from src.ui import step, info, error, fatal, success, warn
-from src import env_detect
-from src import check_prereqs
-from src import adb_utils
-from src import frida_setup
-from src import keydive_runner
-from src import wvd_install
-from src import avd_manager
-
+from src import (  # noqa: E402
+    adb_utils,
+    avd_manager,
+    check_prereqs,
+    env_detect,
+    frida_setup,
+    keydive_runner,
+    wvd_install,
+)
+from src.ui import error, fatal, info, step, success  # noqa: E402
 
 TOTAL_STEPS = 7
 OUTPUT_DIR = _here.parent / "cdm-output"

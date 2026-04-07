@@ -25,9 +25,9 @@ Protocol:
 """
 
 import json
-import sys
 import os
 import subprocess
+import sys
 import threading
 from pathlib import Path
 from typing import Optional
@@ -37,16 +37,17 @@ _here = Path(__file__).resolve().parent
 if str(_here.parent) not in sys.path:
     sys.path.insert(0, str(_here.parent))
 
-from src import ui
-from src import env_detect
-from src import check_prereqs
-from src import adb_utils
-from src import frida_setup
-from src import keydive_runner
-from src import wvd_install
-from src import avd_manager
-from src import drm_trigger
-
+from src import (  # noqa: E402
+    adb_utils,
+    avd_manager,
+    check_prereqs,
+    drm_trigger,
+    env_detect,
+    frida_setup,
+    keydive_runner,
+    ui,
+    wvd_install,
+)
 
 TOTAL_STEPS = 7
 

@@ -9,7 +9,7 @@ a JSON response.
 import json
 import sys
 import threading
-from typing import List, Optional
+from typing import List
 
 # ─── IPC mode ─────────────────────────────────────────────────────────────────
 _ipc_mode = False

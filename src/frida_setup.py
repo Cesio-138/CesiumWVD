@@ -10,8 +10,7 @@ import urllib.request
 from pathlib import Path
 
 from . import adb_utils
-from .ui import info, warn, error, success
-
+from .ui import error, info, success, warn
 
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "CesiumWVD"
 REMOTE_PATH = "/data/local/tmp/frida-server"
@@ -79,7 +78,7 @@ def push_and_start(adb: str, serial: str, local_path: Path):
     adb_utils.shell(adb, serial, f"chmod 755 {REMOTE_PATH}")
 
     # Kill any existing frida-server first
-    adb_utils.shell(adb, serial, f"pkill -f frida-server 2>/dev/null; true")
+    adb_utils.shell(adb, serial, "pkill -f frida-server 2>/dev/null; true")
     time.sleep(1)
 
     # Start in background
