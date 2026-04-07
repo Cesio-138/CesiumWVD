@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><body>
+<h2 id="status">Initializing Widevine...</h2>
+<script>
+const s = document.getElementById('status');
+async function triggerDRM() {
+  try {
+    s.textContent = 'Requesting MediaKeySystemAccess...';
+    const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', [{
+      initDataTypes: ['cenc'],
+      videoCapabilities: [{contentType: 'video/mp4;codecs="avc1.42E01E"'}]
+    }]);
+    s.textContent = 'Creating MediaKeys...';
+    const mediaKeys = await access.createMediaKeys();
+    s.textContent = 'Creating session...';
+    const session = mediaKeys.createSession('temporary');
+    // Minimal PSSH box for Widevine
+    const pssh = new Uint8Array([
+      0x00,0x00,0x00,0x34,0x70,0x73,0x73,0x68,
+      0x00,0x00,0x00,0x00,0xed,0xef,0x8b,0xa9,
+      0x79,0xd6,0x4a,0xce,0xa3,0xc8,0x27,0xdc,
+      0xd5,0x1d,0x21,0xed,0x00,0x00,0x00,0x14,
+      0x08,0x01,0x12,0x10,0x01,0x02,0x03,0x04,
+      0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,
+      0x0d,0x0e,0x0f,0x10
+    ]);
+    s.textContent = 'Generating key request...';
+    await session.generateRequest('cenc', pssh);
+    s.textContent = 'DRM session created! License request generated.';
+  } catch(e) {
+    s.textContent = 'Error: ' + e.message;
+  }
+}
+triggerDRM();
+</script>
+</body></html>
