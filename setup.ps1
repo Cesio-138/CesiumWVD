@@ -38,6 +38,7 @@ if (Test-Path $PythonExe) {
             $_.name -like "*install_only*.tar.gz" -and
             $_.name -like "*$arch*"               -and
             $_.name -like "*windows*msvc*"        -and
+            $_.name -like "*3.12*"                -and
             $_.name -notlike "*freethreaded*"
         } | Select-Object -First 1
         if ($asset) { $dl_url = $asset.browser_download_url }
@@ -77,8 +78,8 @@ if (Test-Path $PythonExe) {
 # ── 2. Install dependencies into .python/ ───────────────────────────────────
 
 Write-Host "  Installing dependencies..."
-& $PipExe install --upgrade pip -q
-& $PipExe install -r (Join-Path $ScriptDir "requirements.txt") -q
+& $PythonExe -m pip install --upgrade pip -q
+& $PythonExe -m pip install -r (Join-Path $ScriptDir "requirements.txt") -q
 
 Write-Host ""
 Write-Host "  Setup complete!" -ForegroundColor Green
