@@ -1,6 +1,20 @@
-# WVD Extractor — Setup (Windows)
-# Creates a virtual environment and installs dependencies.
-# If Python >= 3.8 is not found, downloads a portable Python 3.12 automatically.
+# This script has moved to the project root.
+# Please run setup.ps1 from the CesiumWVD/ project root instead:
+#
+#   cd ..
+#   .\setup.ps1
+#
+# Running it from frontend/ creates the Python environment in the wrong
+# location and the Electron build will not find it.
+
+Write-Host ""
+Write-Host "  ERROR: Run setup.ps1 from the project root, not from frontend/." -ForegroundColor Red
+Write-Host "  cd .."
+Write-Host "  .\setup.ps1"
+Write-Host ""
+exit 1
+
+<# Original script kept below for reference — DO NOT use directly #>
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

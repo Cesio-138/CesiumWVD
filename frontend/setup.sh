@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
-# WVD Extractor — Setup (Linux / WSL2)
-# Creates a virtual environment and installs dependencies.
-# If Python >= 3.8 is not found, downloads a portable Python 3.12 automatically.
+# This script has moved to the project root.
+# Please run setup.sh from the CesiumWVD/ project root instead:
+#
+#   cd ..
+#   ./setup.sh
+#
+# Running it from frontend/ creates the Python environment in the wrong
+# location and the Electron build will not find it.
 
-set -euo pipefail
+echo ""
+echo "  ERROR: Run setup.sh from the project root, not from frontend/."
+echo "  cd .."
+echo "  ./setup.sh"
+echo ""
+exit 1
+
+# Original script kept below for reference — DO NOT use directly
+
+# set -euo pipefail (disabled - script exits above)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$SCRIPT_DIR/venv-wvd"

@@ -1,14 +1,19 @@
 # WVD Extractor — Run extraction (Windows)
-# Activates the venv and runs src/main.py
+# Runs src/main.py using the portable Python from .python/ (preferred)
+# or the virtual environment in venv-wvd/ (legacy fallback).
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$VenvDir = Join-Path $ScriptDir "venv-wvd"
-$PythonExe = Join-Path $VenvDir "Scripts\python.exe"
+
+# Prefer portable Python; fall back to venv for backwards compatibility
+$PythonExe = Join-Path $ScriptDir ".python\python.exe"
+if (-not (Test-Path $PythonExe)) {
+    $PythonExe = Join-Path $ScriptDir "venv-wvd\Scripts\python.exe"
+}
 
 if (-not (Test-Path $PythonExe)) {
     Write-Host ""
-    Write-Host "  ERROR: Virtual environment not found." -ForegroundColor Red
+    Write-Host "  ERROR: Python environment not found." -ForegroundColor Red
     Write-Host "  Run setup first:  .\setup.ps1"
     Write-Host ""
     exit 1

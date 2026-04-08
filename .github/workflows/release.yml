@@ -42,6 +42,15 @@ jobs:
       - name: Install Python dependencies
         run: ${{ matrix.venv_pip }} install -r requirements.txt
 
+      - name: Create portable Python runtime (.python) — Linux
+        if: ${{ matrix.platform == 'linux' }}
+        run: bash ./setup.sh
+
+      - name: Create portable Python runtime (.python) — Windows
+        if: ${{ matrix.platform == 'win' }}
+        shell: pwsh
+        run: .\setup.ps1
+
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci

@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 # WVD Extractor — Run extraction (Linux / WSL2)
-# Activates the venv and runs src/main.py
+# Runs src/main.py using the portable Python from .python/ (preferred)
+# or the virtual environment in venv-wvd/ (legacy fallback).
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_DIR="$SCRIPT_DIR/venv-wvd"
-PYTHON="$VENV_DIR/bin/python"
 
-if [ ! -f "$PYTHON" ]; then
+# Prefer portable Python; fall back to venv for backwards compatibility
+if [ -f "$SCRIPT_DIR/.python/bin/python3" ]; then
+    PYTHON="$SCRIPT_DIR/.python/bin/python3"
+elif [ -f "$SCRIPT_DIR/venv-wvd/bin/python" ]; then
+    PYTHON="$SCRIPT_DIR/venv-wvd/bin/python"
+else
     echo ""
-    echo "  ERROR: Virtual environment not found."
+    echo "  ERROR: Python environment not found."
     echo "  Run setup first:  ./setup.sh"
     echo ""
     exit 1

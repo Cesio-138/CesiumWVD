@@ -14,8 +14,8 @@ extraResources:
     to: backend/src
     filter:
       - "**/*.py"
-  - from: ../venv-wvd
-    to: backend/venv-wvd
+  - from: ../.python
+    to: backend/.python
     filter:
       - "**/*"
   - from: ../requirements.txt

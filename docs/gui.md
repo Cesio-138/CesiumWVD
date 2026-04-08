@@ -52,10 +52,12 @@ The build (configured in `electron-builder.yml`) bundles:
 - Compiled React app (`dist/`)
 - Compiled Electron code (`dist-electron/`)
 - Python backend source (`src/*.py` → `backend/src/`)
-- Python virtual environment (`venv-wvd/` → `backend/venv-wvd/`)
+- Portable Python runtime (`.python/` → `backend/.python/`) — includes all DLLs and packages
 - Python requirements (`requirements.txt` → `backend/requirements.txt`)
 
-> The bundled `venv-wvd/` can be large (~100+ MB) since it includes frida and its dependencies.
+> **Important:** run `.\setup.ps1` / `./setup.sh` from the project root **before** building.
+> This downloads a portable Python 3.12 (~60 MB) into `.python/` with all dependencies installed.
+> The portable runtime is fully self-contained — the packaged app works on machines without Python.
 
 ## How It Works
 
