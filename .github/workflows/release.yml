@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -50,6 +51,8 @@ jobs:
         if: ${{ matrix.platform == 'win' }}
         shell: pwsh
         run: .\setup.ps1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install frontend dependencies
         working-directory: frontend
